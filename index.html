@@ -40,7 +40,7 @@
     gap: 0;
   }
 
-  /* ── 데코 이모지 (배경 고정) ── */
+  /* ── 데코 이모지 ── */
   .deco {
     position: fixed;
     font-size: clamp(22px, 3.5vw, 42px);
@@ -61,7 +61,7 @@
     background: var(--white);
     border-radius: 32px;
     border: 3px solid var(--pink-deep);
-    padding: clamp(16px, 2.5vw, 28px) clamp(20px, 3vw, 36px);
+    padding: clamp(8px, 1.5vw, 16px) clamp(10px, 1.5vw, 20px);
     box-shadow:
       0 8px 0 var(--pink-deep),
       0 12px 32px rgba(244,168,192,0.35);
@@ -71,7 +71,6 @@
     gap: 12px;
   }
 
-  /* ── 별 장식 줄 ── */
   .star-row {
     display: flex;
     align-items: center;
@@ -82,7 +81,6 @@
   }
   .star-row span { font-size: 1.2em; }
 
-  /* ── 룰렛 래퍼 ── */
   .wheel-wrapper {
     position: relative;
     display: flex;
@@ -90,7 +88,6 @@
     justify-content: center;
   }
 
-  /* 외부 장식 링 */
   .outer-ring {
     position: absolute;
     border-radius: 50%;
@@ -109,7 +106,6 @@
     filter: drop-shadow(0 6px 18px rgba(244,168,192,0.6));
   }
 
-  /* ── 포인터 ── */
   .pointer {
     position: absolute;
     top: -12px;
@@ -119,7 +115,6 @@
     filter: drop-shadow(0 2px 4px rgba(139,94,82,0.4));
   }
 
-  /* ── GO 버튼 ── */
   .center-btn {
     position: absolute;
     top: 50%;
@@ -145,67 +140,98 @@
   }
   .center-btn:hover:not(:disabled) {
     transform: translate(-50%,-50%) scale(1.1) translateY(-2px);
-    box-shadow: 0 6px 0 #d4607a, 0 10px 28px rgba(244,128,160,0.55);
   }
   .center-btn:active:not(:disabled) {
     transform: translate(-50%,-50%) scale(0.95) translateY(2px);
-    box-shadow: 0 2px 0 #d4607a, 0 4px 12px rgba(244,128,160,0.4);
   }
   .center-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-  /* ── 결과 ── */
-  #result {
-    min-height: 52px;
-    text-align: center;
-    font-size: clamp(18px, 3vw, 36px);
-    color: var(--brown);
-    letter-spacing: 2px;
-    text-shadow: 0 2px 0 rgba(244,168,192,0.5);
-  }
-  #result.show { animation: resBounce 0.45s cubic-bezier(0.34,1.56,0.64,1) both; }
-  @keyframes resBounce {
-    from { transform: scale(0.4); opacity: 0; }
-    to   { transform: scale(1);   opacity: 1; }
+  /* ── 중앙 결과 오버레이 (새로 추가된 스타일) ── */
+  #overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    display: none; /* 초기 상태 숨김 */
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
   }
 
-  /* ── 폭죽 ── */
+  .result-card {
+    background: white;
+    padding: 40px 60px;
+    border-radius: 40px;
+    border: 8px solid var(--pink-deep);
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    animation: popUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes popUp {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .result-title {
+    font-size: 28px;
+    color: var(--text-mid);
+    margin-bottom: 10px;
+  }
+
+  .result-number {
+    font-size: 80px;
+    color: var(--brown);
+    margin-bottom: 20px;
+    display: block;
+    text-shadow: 4px 4px 0px var(--pink-bg);
+  }
+
+  .close-btn {
+    padding: 12px 30px;
+    font-size: 20px;
+    font-family: 'Jua', sans-serif;
+    background: var(--pink-deep);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #d4607a;
+  }
+  .close-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #d4607a; }
+
+  #result-hint {
+    min-height: 40px;
+    color: var(--brown-soft);
+    font-size: 20px;
+  }
+
   #fireworks {
     position: fixed; inset: 0;
     pointer-events: none;
-    z-index: 50;
+    z-index: 150; /* 오버레이보다 위 */
   }
 </style>
 </head>
 <body>
 
-<!-- 폭죽 -->
 <canvas id="fireworks"></canvas>
 
-<!-- 배경 데코 이모지 -->
 <div class="deco" style="top:4%;  left:3%;  --fd:3.2s; --fdelay:0s">🧁</div>
 <div class="deco" style="top:3%;  right:5%; --fd:2.8s; --fdelay:0.4s">🍓</div>
 <div class="deco" style="top:40%; left:2%; --fd:3.8s; --fdelay:0.8s">🐻</div>
 <div class="deco" style="top:42%; right:2%;--fd:3.1s; --fdelay:0.2s">🧸</div>
 <div class="deco" style="bottom:6%;left:5%;--fd:2.9s; --fdelay:1.0s">☕</div>
 <div class="deco" style="bottom:5%;right:4%;--fd:3.5s;--fdelay:0.6s">💌</div>
-<div class="deco" style="top:18%; left:7%;--fd:4.0s; --fdelay:1.2s">⭐</div>
-<div class="deco" style="top:20%; right:8%;--fd:3.3s;--fdelay:0.9s">🍒</div>
-<div class="deco" style="bottom:20%;left:8%;--fd:3.6s;--fdelay:0.3s">💕</div>
-<div class="deco" style="bottom:22%;right:7%;--fd:2.7s;--fdelay:1.4s">✨</div>
 
-<!-- 카드 -->
 <div class="card">
-  <!-- 별 장식 줄 -->
   <div class="star-row">
-    <span>⭐</span> 2학년 1반 친구들 중 과연 누가 될까? <span>⭐</span>
+    <span>⭐</span> 2학년 1반 친구들 중 과연 누가될까? <span>⭐</span>
   </div>
 
-  <!-- 룰렛 -->
   <div class="wheel-wrapper" id="wheelWrapper">
     <div class="outer-ring" id="outerRing"></div>
     <canvas id="wheel"></canvas>
-
-    <!-- 포인터 하트 화살표 -->
     <svg class="pointer" width="40" height="50" viewBox="0 0 40 50">
       <defs>
         <linearGradient id="pg" x1="0" y1="0" x2="1" y2="1">
@@ -214,25 +240,27 @@
         </linearGradient>
       </defs>
       <polygon points="20,48 2,6 38,6" fill="url(#pg)" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
-      <!-- 하트 -->
-      <path d="M20,17 C20,17 14,12 14,17 C14,21 20,25 20,25 C20,25 26,21 26,17 C26,12 20,17 Z"
-            fill="#fff" opacity="0.9"/>
+      <path d="M20,17 C20,17 14,12 14,17 C14,21 20,25 20,25 C20,25 26,21 26,17 C26,12 20,17 Z" fill="#fff" opacity="0.9"/>
     </svg>
-
     <button class="center-btn" id="spinBtn">돌리기</button>
   </div>
 
-  <!-- 결과 -->
-  <div id="result">🎀 버튼을 눌러보세요! 🎀</div>
+  <div id="result-hint">🎀 버튼을 눌러보세요! 🎀</div>
+</div>
+
+<div id="overlay">
+  <div class="result-card">
+    <div class="result-title">🎉 축하합니다! 🎉</div>
+    <div class="result-number" id="targetNum">0번</div>
+    <button class="close-btn" onclick="closeResult()">다시 돌리기</button>
+  </div>
 </div>
 
 <script>
-/* ── 룰렛 데이터 ── */
 const canvas = document.getElementById('wheel');
 const ctx    = canvas.getContext('2d');
 const items  = Array.from({length: 27}, (_, i) => `${i+1}번`);
 
-/* 파스텔 핑크 계열 팔레트 */
 const COLORS = [
   '#ffb8c8','#ffd6a5','#fdffb6','#caffbf',
   '#9bf6ff','#ffc6ff','#f4a8c0','#ffcba4',
@@ -242,7 +270,6 @@ const COLORS = [
 const NUM   = items.length;
 const SLICE = (Math.PI * 2) / NUM;
 
-/* 조각별 텍스트 색: 밝은 색엔 갈색, 진한 색엔 흰색 */
 const TEXT_COLORS = [
   '#7a3a50','#7a5a30','#7a7a30','#307a50',
   '#30707a','#7a30aa','#7a3060','#7a4a20',
@@ -254,7 +281,7 @@ let spinning = false;
 
 function getR() {
   const vmin = Math.min(window.innerWidth, window.innerHeight);
-  return Math.floor(vmin * 0.36);
+  return Math.floor(vmin * 0.46);
 }
 
 function setupCanvas() {
@@ -262,11 +289,9 @@ function setupCanvas() {
   const size = r * 2;
   canvas.width  = size;
   canvas.height = size;
-
   const wrapper = document.getElementById('wheelWrapper');
   wrapper.style.width  = size + 'px';
   wrapper.style.height = size + 'px';
-
   const pad  = 14;
   const ring = document.getElementById('outerRing');
   ring.style.width  = (size + pad*2) + 'px';
@@ -278,16 +303,11 @@ function setupCanvas() {
 function drawWheel() {
   const r  = getR();
   const cx = r, cy = r;
-
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  /* 바깥 테두리 원 */
   ctx.beginPath();
   ctx.arc(cx, cy, r, 0, Math.PI*2);
   ctx.fillStyle = '#fff0f5';
   ctx.fill();
-
-  /* 전체 회전 */
   ctx.save();
   ctx.translate(cx, cy);
   ctx.rotate(rotAngle);
@@ -296,50 +316,34 @@ function drawWheel() {
   for (let i = 0; i < NUM; i++) {
     const startA = SLICE * i;
     const endA   = startA + SLICE;
-
-    /* 조각 */
     ctx.beginPath();
     ctx.moveTo(cx, cy);
     ctx.arc(cx, cy, r - 5, startA, endA);
     ctx.closePath();
     ctx.fillStyle = COLORS[i % COLORS.length];
     ctx.fill();
-
-    /* 조각 구분선 */
     ctx.strokeStyle = 'rgba(255,255,255,0.7)';
     ctx.lineWidth   = 2;
     ctx.stroke();
-
-    /* 텍스트 */
     ctx.save();
     ctx.translate(cx, cy);
     ctx.rotate(startA + SLICE / 2);
     ctx.textAlign    = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle    = TEXT_COLORS[i % TEXT_COLORS.length];
-    ctx.shadowColor  = 'rgba(255,255,255,0.8)';
-    ctx.shadowBlur   = 3;
-    const fSize = Math.max(9, Math.floor(r * 0.07));
+    const fSize = Math.max(12, Math.floor(r * 0.10));
     ctx.font = `bold ${fSize}px 'Jua', sans-serif`;
-    ctx.fillText(items[i], r * 0.60, 0);
+    ctx.fillText(items[i], r * 0.78, 0);
     ctx.restore();
   }
-
   ctx.restore();
-
-  /* 중앙 원 – 귀여운 핑크 버튼 위에 덮는 흰 원 */
   ctx.beginPath();
   ctx.arc(cx, cy, r * 0.17, 0, Math.PI*2);
   ctx.fillStyle = '#fff0f5';
-  ctx.shadowColor = 'rgba(244,168,192,0.5)';
-  ctx.shadowBlur  = 12;
   ctx.fill();
   ctx.strokeStyle = '#f4a8c0';
   ctx.lineWidth   = 2.5;
   ctx.stroke();
-  ctx.shadowBlur  = 0;
-
-  /* 바깥 링 테두리 */
   ctx.beginPath();
   ctx.arc(cx, cy, r - 2, 0, Math.PI*2);
   ctx.strokeStyle = '#f4a8c0';
@@ -347,21 +351,16 @@ function drawWheel() {
   ctx.stroke();
 }
 
-/* ── 회전 ── */
 const spinBtn = document.getElementById('spinBtn');
 
 function spin() {
   if (spinning) return;
   spinning = true;
-  spinBtn.disabled    = true;
-  spinBtn.textContent = '...';
-
-  const resultEl = document.getElementById('result');
-  resultEl.className   = '';
-  resultEl.textContent = '';
+  spinBtn.disabled = true;
+  document.getElementById('result-hint').textContent = '두구두구두구...';
 
   const totalRot   = Math.PI * 2 * (5 + Math.random() * 6);
-  const duration   = 4200 + Math.random() * 1500;
+  const duration   = 4500;
   const startTime  = performance.now();
   const startAngle = rotAngle;
 
@@ -374,11 +373,8 @@ function spin() {
     if (t < 1) {
       requestAnimationFrame(animate);
     } else {
-      rotAngle            = startAngle + totalRot;
-      drawWheel();
-      spinning            = false;
-      spinBtn.disabled    = false;
-      spinBtn.textContent = '돌리기';
+      spinning = false;
+      spinBtn.disabled = false;
       showResult();
     }
   }
@@ -388,16 +384,21 @@ function spin() {
 function showResult() {
   const ptrAngle = ((-rotAngle - Math.PI / 2) % (Math.PI*2) + Math.PI*2) % (Math.PI*2);
   const idx      = Math.floor(ptrAngle / SLICE) % NUM;
-
-  const resultEl = document.getElementById('result');
-  resultEl.textContent = `🎀 ${items[idx]} 당첨! 🎉`;
-  void resultEl.offsetWidth;
-  resultEl.className = 'show';
-
+  
+  // 중앙 팝업 데이터 입력 및 노출
+  document.getElementById('targetNum').textContent = items[idx];
+  document.getElementById('overlay').style.display = 'flex';
+  document.getElementById('result-hint').textContent = '축하합니다!';
+  
   launchFireworks();
 }
 
-/* ── 폭죽 (핑크·파스텔 컬러) ── */
+function closeResult() {
+  document.getElementById('overlay').style.display = 'none';
+  document.getElementById('result-hint').textContent = '🎀 한 번 더 돌려볼까요? 🎀';
+}
+
+/* ── 폭죽 애니메이션 ── */
 const fwCanvas = document.getElementById('fireworks');
 const fwCtx    = fwCanvas.getContext('2d');
 let   particles = [];
@@ -412,55 +413,40 @@ resizeFW();
 const FW_COLORS = ['#ffb8c8','#ffd6a5','#caffbf','#9bf6ff','#ffc6ff','#fff176','#f4a8c0'];
 
 function launchFireworks() {
-  for (let b = 0; b < 8; b++) {
+  for (let b = 0; b < 10; b++) {
     setTimeout(() => {
-      const x   = fwCanvas.width  * (0.1 + Math.random() * 0.8);
-      const y   = fwCanvas.height * (0.05 + Math.random() * 0.45);
+      const x = fwCanvas.width * (0.2 + Math.random() * 0.6);
+      const y = fwCanvas.height * (0.2 + Math.random() * 0.4);
       const col = FW_COLORS[Math.floor(Math.random() * FW_COLORS.length)];
-      for (let i = 0; i < 55; i++) {
-        const a  = (Math.PI*2 / 55) * i + Math.random() * 0.15;
-        const sp = Math.random() * 5.5 + 1.5;
+      for (let i = 0; i < 50; i++) {
+        const a = (Math.PI*2 / 50) * i + Math.random() * 0.2;
+        const sp = Math.random() * 6 + 2;
         particles.push({
-          x, y,
-          vx: Math.cos(a)*sp, vy: Math.sin(a)*sp,
-          alpha: 1,
-          color: col,
-          r: Math.random()*3 + 1.5,
-          shape: Math.random() < 0.3 ? 'star' : 'circle',
+          x, y, vx: Math.cos(a)*sp, vy: Math.sin(a)*sp,
+          alpha: 1, color: col, r: Math.random()*3 + 2,
+          shape: Math.random() < 0.3 ? 'star' : 'circle'
         });
       }
-    }, b * 180);
+    }, b * 200);
   }
   if (!fwRaf) animFW();
-}
-
-function drawStar(ctx, x, y, r) {
-  ctx.beginPath();
-  for (let i = 0; i < 5; i++) {
-    const a  = (Math.PI*2/5)*i - Math.PI/2;
-    const ia = a + Math.PI/5;
-    if (i===0) ctx.moveTo(x + Math.cos(a)*r, y + Math.sin(a)*r);
-    else        ctx.lineTo(x + Math.cos(a)*r, y + Math.sin(a)*r);
-    ctx.lineTo(x + Math.cos(ia)*r*0.45, y + Math.sin(ia)*r*0.45);
-  }
-  ctx.closePath();
 }
 
 function animFW() {
   fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
   particles = particles.filter(p => p.alpha > 0.02);
   for (const p of particles) {
-    p.x += p.vx;
-    p.y += p.vy;
-    p.vy += 0.08;
-    p.alpha -= 0.013;
+    p.x += p.vx; p.y += p.vy; p.vy += 0.1; p.alpha -= 0.015;
     fwCtx.save();
-    fwCtx.globalAlpha  = p.alpha;
-    fwCtx.fillStyle    = p.color;
-    fwCtx.shadowColor  = p.color;
-    fwCtx.shadowBlur   = 8;
+    fwCtx.globalAlpha = p.alpha;
+    fwCtx.fillStyle = p.color;
     if (p.shape === 'star') {
-      drawStar(fwCtx, p.x, p.y, p.r * 1.5);
+      fwCtx.beginPath();
+      for(let i=0; i<5; i++){
+        const a = (Math.PI*2/5)*i - Math.PI/2;
+        fwCtx.lineTo(p.x + Math.cos(a)*p.r*2, p.y + Math.sin(a)*p.r*2);
+        fwCtx.lineTo(p.x + Math.cos(a+Math.PI/5)*p.r, p.y + Math.sin(a+Math.PI/5)*p.r);
+      }
       fwCtx.fill();
     } else {
       fwCtx.beginPath();
@@ -469,15 +455,10 @@ function animFW() {
     }
     fwCtx.restore();
   }
-  if (particles.length > 0) {
-    fwRaf = requestAnimationFrame(animFW);
-  } else {
-    fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
-    fwRaf = null;
-  }
+  if (particles.length > 0) fwRaf = requestAnimationFrame(animFW);
+  else fwRaf = null;
 }
 
-/* ── 초기 실행 ── */
 setupCanvas();
 drawWheel();
 spinBtn.addEventListener('click', spin);
